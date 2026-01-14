@@ -2,450 +2,608 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pollinations AI Client</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pollinations AI Mobile</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#7c3aed">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <header class="header">
+    <!-- Mobile Header -->
+    <header class="mobile-header">
+        <div class="header-top">
+            <button class="menu-btn" id="menuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
             <div class="logo">
                 <i class="fas fa-robot"></i>
-                <h1>Pollinations AI Client</h1>
+                <h1>Pollinations</h1>
             </div>
-            <div class="api-key-section">
-                <input type="password" id="apiKey" placeholder="Enter your API Key (sk_ or pk_)">
-                <button id="saveKey"><i class="fas fa-save"></i> Save</button>
-                <button id="byopBtn"><i class="fas fa-user"></i> BYOP Auth</button>
-                <button id="clearKey"><i class="fas fa-trash"></i> Clear</button>
+            <button class="user-btn" id="userBtn">
+                <i class="fas fa-user"></i>
+            </button>
+        </div>
+        
+        <div class="header-bottom">
+            <div class="api-key-container">
+                <input type="password" id="apiKey" placeholder="Enter API Key (sk_ or pk_)">
+                <button id="saveKey" class="icon-btn">
+                    <i class="fas fa-save"></i>
+                </button>
             </div>
-            <div class="status">
-                <span id="keyStatus">No API Key</span>
-                <div class="balance" id="balanceDisplay">
-                    <i class="fas fa-coins"></i>
-                    <span>Loading...</span>
-                </div>
+            <div class="status-badge" id="keyStatus">
+                <i class="fas fa-key"></i>
+                <span>No Key</span>
             </div>
-        </header>
+        </div>
+    </header>
 
-        <!-- Navigation Tabs -->
-        <nav class="tabs">
-            <button class="tab active" data-tab="chat"><i class="fas fa-comments"></i> Chat</button>
-            <button class="tab" data-tab="image"><i class="fas fa-image"></i> Image Generation</button>
-            <button class="tab" data-tab="text"><i class="fas fa-font"></i> Text Generation</button>
-            <button class="tab" data-tab="models"><i class="fas fa-list"></i> Models</button>
-            <button class="tab" data-tab="settings"><i class="fas fa-cog"></i> Settings</button>
-        </nav>
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <button class="nav-btn active" data-tab="chat">
+            <i class="fas fa-comment"></i>
+            <span>Chat</span>
+        </button>
+        <button class="nav-btn" data-tab="image">
+            <i class="fas fa-image"></i>
+            <span>Image</span>
+        </button>
+        <button class="nav-btn" data-tab="text">
+            <i class="fas fa-font"></i>
+            <span>Text</span>
+        </button>
+        <button class="nav-btn" data-tab="models">
+            <i class="fas fa-list"></i>
+            <span>Models</span>
+        </button>
+        <button class="nav-btn" data-tab="more">
+            <i class="fas fa-ellipsis-h"></i>
+            <span>More</span>
+        </button>
+    </nav>
 
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Chat Tab -->
-            <div id="chat" class="tab-content active">
-                <div class="chat-container">
-                    <div class="chat-sidebar">
-                        <h3><i class="fas fa-brain"></i> Model Settings</h3>
-                        <div class="model-selector">
-                            <label for="chatModel">Model:</label>
-                            <select id="chatModel">
-                                <option value="openai">OpenAI (Default)</option>
-                                <option value="openai-fast">OpenAI Fast</option>
-                                <option value="gemini">Gemini</option>
-                                <option value="claude">Claude</option>
-                                <option value="deepseek">DeepSeek</option>
-                            </select>
-                        </div>
-                        <div class="settings-group">
-                            <label for="temperature">Temperature: <span id="tempValue">1.0</span></label>
-                            <input type="range" id="temperature" min="0" max="2" step="0.1" value="1">
-                        </div>
-                        <div class="settings-group">
-                            <label><input type="checkbox" id="streaming"> Enable Streaming</label>
-                            <label><input type="checkbox" id="vision"> Enable Vision</label>
-                            <label><input type="checkbox" id="tools"> Enable Tools</label>
-                        </div>
-                        <button id="newChat"><i class="fas fa-plus"></i> New Chat</button>
-                        <div class="chat-history">
-                            <h4>Chat History</h4>
-                            <div id="historyList"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="chat-main">
-                        <div class="chat-messages" id="chatMessages">
-                            <div class="welcome-message">
-                                <h3>Welcome to Pollinations AI Chat</h3>
-                                <p>Start by entering your API key above, then type a message below to begin chatting!</p>
-                            </div>
-                        </div>
-                        
-                        <div class="chat-input-area">
-                            <div class="input-tools">
-                                <button id="uploadImage" title="Upload Image"><i class="fas fa-image"></i></button>
-                                <button id="uploadFile" title="Upload File"><i class="fas fa-paperclip"></i></button>
-                                <button id="recordAudio" title="Record Audio"><i class="fas fa-microphone"></i></button>
-                                <input type="file" id="imageUpload" accept="image/*" hidden>
-                                <input type="file" id="fileUpload" hidden>
-                            </div>
-                            <div class="message-input-container">
-                                <textarea id="messageInput" placeholder="Type your message here... (Shift+Enter for new line, Enter to send)" rows="3"></textarea>
-                                <button id="sendMessage"><i class="fas fa-paper-plane"></i> Send</button>
-                            </div>
-                            <div class="preview-area" id="previewArea"></div>
-                        </div>
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Chat Tab -->
+        <section id="chat" class="tab-content active">
+            <div class="chat-header">
+                <div class="model-selector">
+                    <select id="chatModel">
+                        <option value="openai">OpenAI</option>
+                        <option value="gemini">Gemini</option>
+                        <option value="claude">Claude</option>
+                    </select>
+                    <div class="quick-settings">
+                        <button class="icon-btn small" id="tempDown">
+                            <i class="fas fa-thermometer-empty"></i>
+                        </button>
+                        <span id="tempValue">1.0</span>
+                        <button class="icon-btn small" id="tempUp">
+                            <i class="fas fa-thermometer-full"></i>
+                        </button>
+                        <label class="switch">
+                            <input type="checkbox" id="streaming">
+                            <span class="slider"></span>
+                        </label>
+                        <span class="switch-label">Stream</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Image Generation Tab -->
-            <div id="image" class="tab-content">
-                <div class="image-generator">
-                    <div class="generator-sidebar">
-                        <h3><i class="fas fa-sliders-h"></i> Image Settings</h3>
-                        
-                        <div class="model-selector">
-                            <label for="imageModel">Model:</label>
-                            <select id="imageModel">
-                                <option value="flux">Flux (Default)</option>
-                                <option value="zimage">ZImage</option>
-                                <option value="turbo">Turbo</option>
-                                <option value="gptimage">GPT Image</option>
-                                <option value="kontext">Kontext</option>
-                                <option value="seedream">Seedream</option>
-                                <option value="nanobanana">Nanobanana</option>
-                                <option value="veo">Veo (Video)</option>
-                                <option value="seedance">Seedance (Video)</option>
-                            </select>
-                        </div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="welcome-message">
+                    <i class="fas fa-robot"></i>
+                    <h3>Welcome to Pollinations AI</h3>
+                    <p>Start by entering your API key above, then send a message to begin chatting!</p>
+                </div>
+            </div>
 
-                        <div class="settings-group">
-                            <label for="width">Width: <span id="widthValue">1024</span>px</label>
-                            <input type="range" id="width" min="256" max="2048" step="64" value="1024">
-                        </div>
-                        
-                        <div class="settings-group">
-                            <label for="height">Height: <span id="heightValue">1024</span>px</label>
-                            <input type="range" id="height" min="256" max="2048" step="64" value="1024">
-                        </div>
-                        
-                        <div class="settings-group">
-                            <label for="seed">Seed:</label>
-                            <input type="number" id="seed" value="0" min="-1">
-                            <button id="randomSeed">Random</button>
-                        </div>
-                        
-                        <div class="settings-group">
-                            <label for="quality">Quality:</label>
-                            <select id="quality">
-                                <option value="medium">Medium</option>
-                                <option value="low">Low</option>
-                                <option value="high">High</option>
-                                <option value="hd">HD</option>
-                            </select>
-                        </div>
-                        
-                        <div class="settings-group">
-                            <label><input type="checkbox" id="enhance"> Enhance Prompt</label>
-                            <label><input type="checkbox" id="safe"> Safe Mode</label>
-                            <label><input type="checkbox" id="transparent"> Transparent BG</label>
-                        </div>
-                        
-                        <div class="settings-group">
-                            <label for="negativePrompt">Negative Prompt:</label>
-                            <textarea id="negativePrompt" rows="3" placeholder="What to avoid...">worst quality, blurry</textarea>
-                        </div>
-                        
-                        <div class="settings-group" id="videoSettings">
-                            <label for="duration">Duration (seconds):</label>
-                            <input type="number" id="duration" min="2" max="10" value="4">
-                            
-                            <label for="aspectRatio">Aspect Ratio:</label>
-                            <select id="aspectRatio">
-                                <option value="">Default</option>
-                                <option value="16:9">16:9</option>
-                                <option value="9:16">9:16</option>
-                            </select>
-                            
-                            <label><input type="checkbox" id="audio"> Generate Audio</label>
-                        </div>
-                        
-                        <button id="generateImage" class="generate-btn"><i class="fas fa-magic"></i> Generate Image</button>
-                        <button id="batchGenerate" class="secondary-btn"><i class="fas fa-layer-group"></i> Batch Generate (4)</button>
+            <div class="chat-input-area">
+                <div class="input-attachments">
+                    <button class="icon-btn" id="attachImage">
+                        <i class="fas fa-image"></i>
+                    </button>
+                    <button class="icon-btn" id="attachFile">
+                        <i class="fas fa-paperclip"></i>
+                    </button>
+                    <button class="icon-btn" id="attachAudio">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                    <input type="file" id="imageUpload" accept="image/*" hidden>
+                    <input type="file" id="fileUpload" hidden>
+                </div>
+                
+                <div class="input-wrapper">
+                    <textarea id="messageInput" placeholder="Type your message..." rows="1"></textarea>
+                    <button class="send-btn" id="sendMessage">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                
+                <div class="preview-area" id="previewArea"></div>
+            </div>
+        </section>
+
+        <!-- Image Generation Tab -->
+        <section id="image" class="tab-content">
+            <div class="tab-header">
+                <h2><i class="fas fa-magic"></i> Generate Image</h2>
+                <button class="icon-btn" id="imageSettingsBtn">
+                    <i class="fas fa-sliders-h"></i>
+                </button>
+            </div>
+
+            <div class="image-prompt-area">
+                <textarea id="imagePrompt" placeholder="Describe what you want to create... Be specific and detailed!" rows="3"></textarea>
+                <div class="prompt-tools">
+                    <button class="btn-outline" id="promptSamples">
+                        <i class="fas fa-lightbulb"></i> Examples
+                    </button>
+                    <button class="btn-outline" id="promptEnhancer">
+                        <i class="fas fa-wand-magic-sparkles"></i> Enhance
+                    </button>
+                </div>
+            </div>
+
+            <div class="model-selector-card">
+                <label>Model:</label>
+                <select id="imageModel">
+                    <option value="flux">Flux (Default)</option>
+                    <option value="zimage">ZImage</option>
+                    <option value="turbo">Turbo</option>
+                    <option value="gptimage">GPT Image</option>
+                    <option value="veo">Veo (Video)</option>
+                    <option value="seedance">Seedance (Video)</option>
+                </select>
+            </div>
+
+            <div class="quick-settings-grid">
+                <div class="setting-item">
+                    <label>Size:</label>
+                    <div class="size-selector">
+                        <button class="size-btn active" data-size="512x512">512</button>
+                        <button class="size-btn" data-size="768x768">768</button>
+                        <button class="size-btn" data-size="1024x1024">1024</button>
                     </div>
-                    
-                    <div class="generator-main">
-                        <div class="prompt-area">
-                            <textarea id="imagePrompt" placeholder="Describe the image you want to generate... Be detailed and creative!" rows="4"></textarea>
-                            <div class="prompt-tools">
-                                <button id="promptSamples"><i class="fas fa-lightbulb"></i> Examples</button>
-                                <button id="promptEnhancer"><i class="fas fa-wand-magic-sparkles"></i> Enhance</button>
-                            </div>
-                        </div>
-                        
-                        <div class="image-results">
-                            <div class="result-header">
-                                <h3><i class="fas fa-images"></i> Generated Images</h3>
-                                <div class="result-actions">
-                                    <button id="clearResults"><i class="fas fa-trash"></i> Clear All</button>
-                                    <button id="downloadAll"><i class="fas fa-download"></i> Download All</button>
-                                </div>
-                            </div>
-                            <div class="images-grid" id="imagesGrid">
-                                <div class="placeholder">
-                                    <i class="fas fa-image"></i>
-                                    <p>Your generated images will appear here</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="image-controls">
-                            <div class="reference-image">
-                                <h4><i class="fas fa-link"></i> Reference Image URL</h4>
-                                <input type="text" id="referenceImage" placeholder="Optional: Enter image URL for img2img/video">
-                            </div>
-                        </div>
+                </div>
+                
+                <div class="setting-item">
+                    <label>Quality:</label>
+                    <select id="quality">
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+                
+                <div class="setting-item">
+                    <label>Seed:</label>
+                    <div class="seed-input">
+                        <input type="number" id="seed" value="0" min="-1">
+                        <button class="icon-btn small" id="randomSeed">
+                            <i class="fas fa-dice"></i>
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Text Generation Tab -->
-            <div id="text" class="tab-content">
-                <div class="text-generator">
-                    <div class="text-sidebar">
-                        <h3><i class="fas fa-cogs"></i> Text Settings</h3>
-                        
-                        <div class="model-selector">
-                            <label for="textModel">Model:</label>
-                            <select id="textModel">
-                                <option value="openai">OpenAI</option>
-                                <option value="gemini">Gemini</option>
-                                <option value="claude">Claude</option>
-                                <option value="deepseek">DeepSeek</option>
-                                <option value="perplexity-reasoning">Perplexity Reasoning</option>
-                            </select>
-                        </div>
-                        
-                        <div class="settings-group">
-                            <label for="maxTokens">Max Tokens: <span id="tokensValue">1000</span></label>
-                            <input type="range" id="maxTokens" min="100" max="4000" step="100" value="1000">
-                        </div>
-                        
-                        <div class="settings-group">
-                            <label for="textTemperature">Temperature: <span id="textTempValue">0.7</span></label>
-                            <input type="range" id="textTemperature" min="0" max="2" step="0.1" value="0.7">
-                        </div>
-                        
-                        <div class="settings-group">
-                            <label><input type="checkbox" id="jsonMode"> JSON Mode</label>
-                            <label><input type="checkbox" id="textStreaming"> Streaming</label>
-                            <label><input type="checkbox" id="reasoning"> Enable Reasoning</label>
-                        </div>
-                        
-                        <div class="settings-group">
-                            <label for="systemPrompt">System Prompt:</label>
-                            <textarea id="systemPrompt" rows="4" placeholder="You are a helpful assistant..."></textarea>
-                        </div>
-                        
-                        <div class="presets">
-                            <h4>Quick Presets</h4>
-                            <button class="preset-btn" data-preset="creative">Creative Writing</button>
-                            <button class="preset-btn" data-preset="code">Code Generation</button>
-                            <button class="preset-btn" data-preset="analysis">Analysis</button>
-                            <button class="preset-btn" data-preset="translation">Translation</button>
-                        </div>
-                    </div>
-                    
-                    <div class="text-main">
-                        <div class="text-input-area">
-                            <textarea id="textPrompt" placeholder="Enter your text prompt here..." rows="6"></textarea>
-                            <div class="text-tools">
-                                <button id="generateText" class="primary-btn"><i class="fas fa-bolt"></i> Generate Text</button>
-                                <button id="stopGeneration" class="secondary-btn" disabled><i class="fas fa-stop"></i> Stop</button>
-                                <button id="copyText" class="secondary-btn"><i class="fas fa-copy"></i> Copy</button>
-                                <button id="clearText" class="secondary-btn"><i class="fas fa-trash"></i> Clear</button>
-                            </div>
-                        </div>
-                        
-                        <div class="text-results">
-                            <div class="result-header">
-                                <h3><i class="fas fa-file-alt"></i> Generated Text</h3>
-                                <div class="result-info">
-                                    <span id="tokenCount">Tokens: 0</span>
-                                    <span id="timeElapsed">Time: 0s</span>
-                                </div>
-                            </div>
-                            <div class="text-output" id="textOutput">
-                                <div class="placeholder">
-                                    <i class="fas fa-keyboard"></i>
-                                    <p>Your generated text will appear here</p>
-                                </div>
-                            </div>
-                        </div>
+            <div class="toggle-group">
+                <label class="toggle-item">
+                    <input type="checkbox" id="enhance">
+                    <span class="toggle-label">Enhance Prompt</span>
+                </label>
+                <label class="toggle-item">
+                    <input type="checkbox" id="safe">
+                    <span class="toggle-label">Safe Mode</span>
+                </label>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn-primary" id="generateImage">
+                    <i class="fas fa-bolt"></i> Generate Now
+                </button>
+                <button class="btn-secondary" id="batchGenerate">
+                    <i class="fas fa-layer-group"></i> Generate 4
+                </button>
+            </div>
+
+            <div class="image-results" id="imageResults">
+                <div class="section-header">
+                    <h3>Generated Images</h3>
+                    <button class="icon-btn" id="clearResults">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+                <div class="images-scroll" id="imagesScroll">
+                    <div class="empty-state">
+                        <i class="fas fa-image"></i>
+                        <p>Your generated images will appear here</p>
                     </div>
                 </div>
             </div>
+        </section>
 
-            <!-- Models Tab -->
-            <div id="models" class="tab-content">
-                <div class="models-explorer">
-                    <div class="models-header">
-                        <h2><i class="fas fa-list-ul"></i> Available Models</h2>
-                        <div class="model-filters">
-                            <button class="filter-btn active" data-type="all">All Models</button>
-                            <button class="filter-btn" data-type="text">Text Models</button>
-                            <button class="filter-btn" data-type="image">Image Models</button>
-                            <button class="filter-btn" data-type="video">Video Models</button>
-                        </div>
+        <!-- Text Generation Tab -->
+        <section id="text" class="tab-content">
+            <div class="tab-header">
+                <h2><i class="fas fa-keyboard"></i> Text Generation</h2>
+                <button class="icon-btn" id="textPresetsBtn">
+                    <i class="fas fa-bolt"></i>
+                </button>
+            </div>
+
+            <div class="text-input-area">
+                <textarea id="textPrompt" placeholder="Enter your text prompt here..." rows="4"></textarea>
+                
+                <div class="presets-grid">
+                    <button class="preset-btn" data-preset="creative">
+                        <i class="fas fa-paint-brush"></i>
+                        <span>Creative</span>
+                    </button>
+                    <button class="preset-btn" data-preset="code">
+                        <i class="fas fa-code"></i>
+                        <span>Code</span>
+                    </button>
+                    <button class="preset-btn" data-preset="analysis">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Analysis</span>
+                    </button>
+                    <button class="preset-btn" data-preset="translation">
+                        <i class="fas fa-language"></i>
+                        <span>Translate</span>
+                    </button>
+                </div>
+
+                <div class="model-selector-card">
+                    <label>Model:</label>
+                    <select id="textModel">
+                        <option value="openai">OpenAI</option>
+                        <option value="gemini">Gemini</option>
+                        <option value="claude">Claude</option>
+                        <option value="deepseek">DeepSeek</option>
+                    </select>
+                </div>
+
+                <div class="slider-group">
+                    <div class="slider-item">
+                        <label>Length: <span id="maxTokensValue">500</span> tokens</label>
+                        <input type="range" id="maxTokens" min="100" max="2000" step="100" value="500">
                     </div>
                     
-                    <div class="models-grid" id="modelsGrid">
-                        <!-- Models will be loaded dynamically -->
-                        <div class="loading">
-                            <i class="fas fa-spinner fa-spin"></i>
-                            <p>Loading available models...</p>
-                        </div>
+                    <div class="slider-item">
+                        <label>Creativity: <span id="textTempValue">0.7</span></label>
+                        <input type="range" id="textTemperature" min="0" max="2" step="0.1" value="0.7">
                     </div>
-                    
-                    <div class="model-details" id="modelDetails">
-                        <div class="details-placeholder">
-                            <i class="fas fa-info-circle"></i>
-                            <p>Select a model to view details</p>
-                        </div>
-                    </div>
+                </div>
+
+                <div class="toggle-group">
+                    <label class="toggle-item">
+                        <input type="checkbox" id="jsonMode">
+                        <span class="toggle-label">JSON Output</span>
+                    </label>
+                    <label class="toggle-item">
+                        <input type="checkbox" id="textStreaming">
+                        <span class="toggle-label">Stream Response</span>
+                    </label>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn-primary" id="generateText">
+                        <i class="fas fa-play"></i> Generate Text
+                    </button>
+                    <button class="btn-secondary" id="stopGeneration" disabled>
+                        <i class="fas fa-stop"></i> Stop
+                    </button>
                 </div>
             </div>
 
-            <!-- Settings Tab -->
-            <div id="settings" class="tab-content">
-                <div class="settings-container">
-                    <div class="settings-section">
-                        <h3><i class="fas fa-key"></i> API Configuration</h3>
-                        <div class="setting-item">
-                            <label>Default Model:</label>
-                            <select id="defaultModel">
-                                <option value="openai">OpenAI</option>
-                                <option value="flux">Flux (Image)</option>
-                                <option value="gemini">Gemini</option>
-                            </select>
-                        </div>
-                        <div class="setting-item">
-                            <label>API Endpoint:</label>
-                            <input type="text" id="apiEndpoint" value="https://gen.pollinations.ai" readonly>
-                        </div>
-                        <div class="setting-item">
-                            <label>Auto-save API Key:</label>
-                            <input type="checkbox" id="autoSaveKey" checked>
-                        </div>
+            <div class="text-output-area">
+                <div class="section-header">
+                    <h3>Generated Text</h3>
+                    <div class="text-actions">
+                        <button class="icon-btn" id="copyText">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                        <button class="icon-btn" id="clearText">
+                            <i class="fas fa-trash"></i>
+                        </button>
                     </div>
-                    
-                    <div class="settings-section">
-                        <h3><i class="fas fa-paint-brush"></i> Appearance</h3>
-                        <div class="setting-item">
-                            <label>Theme:</label>
-                            <select id="themeSelect">
-                                <option value="light">Light</option>
-                                <option value="dark">Dark</option>
-                                <option value="auto">Auto</option>
-                            </select>
-                        </div>
-                        <div class="setting-item">
-                            <label>Font Size:</label>
-                            <select id="fontSize">
-                                <option value="small">Small</option>
-                                <option value="medium" selected>Medium</option>
-                                <option value="large">Large</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="settings-section">
-                        <h3><i class="fas fa-tachometer-alt"></i> Performance</h3>
-                        <div class="setting-item">
-                            <label>Max Results to Keep:</label>
-                            <input type="number" id="maxResults" min="10" max="100" value="20">
-                        </div>
-                        <div class="setting-item">
-                            <label>Auto-refresh Balance:</label>
-                            <input type="checkbox" id="autoRefreshBalance" checked>
-                        </div>
-                        <div class="setting-item">
-                            <label>Cache Duration (minutes):</label>
-                            <input type="number" id="cacheDuration" min="1" max="60" value="10">
-                        </div>
-                    </div>
-                    
-                    <div class="settings-section">
-                        <h3><i class="fas fa-shield-alt"></i> Safety & Privacy</h3>
-                        <div class="setting-item">
-                            <label>Enable Content Filter:</label>
-                            <input type="checkbox" id="contentFilter" checked>
-                        </div>
-                        <div class="setting-item">
-                            <label>Clear History on Close:</label>
-                            <input type="checkbox" id="clearHistory">
-                        </div>
-                    </div>
-                    
-                    <div class="settings-actions">
-                        <button id="saveSettings" class="primary-btn"><i class="fas fa-save"></i> Save Settings</button>
-                        <button id="resetSettings" class="secondary-btn"><i class="fas fa-undo"></i> Reset to Default</button>
-                        <button id="exportSettings" class="secondary-btn"><i class="fas fa-download"></i> Export Settings</button>
-                        <button id="importSettings" class="secondary-btn"><i class="fas fa-upload"></i> Import Settings</button>
-                        <input type="file" id="settingsFile" hidden accept=".json">
+                </div>
+                <div class="text-output" id="textOutput">
+                    <div class="empty-state">
+                        <i class="fas fa-file-alt"></i>
+                        <p>Your generated text will appear here</p>
                     </div>
                 </div>
             </div>
-        </main>
+        </section>
 
-        <!-- Status Bar -->
-        <footer class="status-bar">
-            <div class="status-left">
-                <span id="connectionStatus"><i class="fas fa-circle"></i> Not Connected</span>
-                <span id="currentModel">Model: None</span>
+        <!-- Models Tab -->
+        <section id="models" class="tab-content">
+            <div class="tab-header">
+                <h2><i class="fas fa-cubes"></i> AI Models</h2>
+                <div class="model-filters">
+                    <button class="filter-btn active" data-type="all">All</button>
+                    <button class="filter-btn" data-type="text">Text</button>
+                    <button class="filter-btn" data-type="image">Image</button>
+                </div>
             </div>
-            <div class="status-right">
-                <span id="responseTime">Response: --</span>
-                <span id="tokensUsed">Tokens: 0</span>
-                <span id="costEstimate">Cost: $0.00</span>
+
+            <div class="models-list" id="modelsList">
+                <div class="loading-state">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Loading available models...</p>
+                </div>
             </div>
-        </footer>
+
+            <div class="model-details" id="modelDetails">
+                <div class="empty-state">
+                    <i class="fas fa-info-circle"></i>
+                    <p>Select a model to view details</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- More Tab (Settings) -->
+        <section id="more" class="tab-content">
+            <div class="tab-header">
+                <h2><i class="fas fa-cog"></i> Settings</h2>
+            </div>
+
+            <div class="settings-list">
+                <div class="settings-section">
+                    <h3><i class="fas fa-user-circle"></i> Account</h3>
+                    <button class="settings-item" id="byopBtn">
+                        <i class="fas fa-sign-in-alt"></i>
+                        <span>BYOP Authentication</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                    <div class="settings-item">
+                        <i class="fas fa-coins"></i>
+                        <span>Balance: <span id="balanceDisplay">Loading...</span></span>
+                    </div>
+                    <button class="settings-item" id="clearKeyBtn">
+                        <i class="fas fa-trash"></i>
+                        <span>Clear API Key</span>
+                    </button>
+                </div>
+
+                <div class="settings-section">
+                    <h3><i class="fas fa-paint-brush"></i> Appearance</h3>
+                    <div class="settings-item">
+                        <i class="fas fa-moon"></i>
+                        <span>Theme</span>
+                        <select id="themeSelect" class="settings-select">
+                            <option value="auto">Auto</option>
+                            <option value="light">Light</option>
+                            <option value="dark">Dark</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3><i class="fas fa-tachometer-alt"></i> Performance</h3>
+                    <label class="settings-item toggle">
+                        <i class="fas fa-sync-alt"></i>
+                        <span>Auto-refresh Balance</span>
+                        <input type="checkbox" id="autoRefreshBalance" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <label class="settings-item toggle">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Content Filter</span>
+                        <input type="checkbox" id="contentFilter" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="settings-section">
+                    <h3><i class="fas fa-info-circle"></i> About</h3>
+                    <button class="settings-item" id="aboutBtn">
+                        <i class="fas fa-question-circle"></i>
+                        <span>Help & Tutorials</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                    <button class="settings-item" id="exportBtn">
+                        <i class="fas fa-download"></i>
+                        <span>Export Settings</span>
+                    </button>
+                    <button class="settings-item" id="resetBtn">
+                        <i class="fas fa-undo"></i>
+                        <span>Reset to Default</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Side Menu -->
+    <div class="side-menu" id="sideMenu">
+        <div class="menu-header">
+            <div class="user-info">
+                <div class="avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-details">
+                    <h3>Pollinations User</h3>
+                    <span class="user-status" id="userStatus">Not Authenticated</span>
+                </div>
+            </div>
+            <button class="close-menu" id="closeMenu">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="menu-content">
+            <a href="#" class="menu-item active" data-tab="chat">
+                <i class="fas fa-comment"></i>
+                <span>Chat</span>
+            </a>
+            <a href="#" class="menu-item" data-tab="image">
+                <i class="fas fa-image"></i>
+                <span>Image Generation</span>
+            </a>
+            <a href="#" class="menu-item" data-tab="text">
+                <i class="fas fa-font"></i>
+                <span>Text Generation</span>
+            </a>
+            <a href="#" class="menu-item" data-tab="models">
+                <i class="fas fa-list"></i>
+                <span>Models</span>
+            </a>
+            <a href="#" class="menu-item" data-tab="more">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+            
+            <div class="menu-divider"></div>
+            
+            <a href="#" class="menu-item" id="quickStart">
+                <i class="fas fa-rocket"></i>
+                <span>Quick Start Guide</span>
+            </a>
+            <a href="#" class="menu-item" id="apiDocs">
+                <i class="fas fa-book"></i>
+                <span>API Documentation</span>
+            </a>
+            <a href="#" class="menu-item" id="support">
+                <i class="fas fa-life-ring"></i>
+                <span>Support</span>
+            </a>
+        </div>
+
+        <div class="menu-footer">
+            <div class="version">v1.0.0</div>
+        </div>
     </div>
+    <div class="menu-overlay" id="menuOverlay"></div>
 
-    <!-- Modals -->
-    <div id="authModal" class="modal">
+    <!-- Image Settings Modal -->
+    <div class="modal" id="imageSettingsModal">
         <div class="modal-content">
-            <h2><i class="fas fa-user-lock"></i> BYOP Authentication</h2>
-            <p>Connect with Pollinations to use your own Pollen:</p>
-            <ol>
-                <li>Click the button below to authenticate</li>
-                <li>You'll be redirected to Pollinations</li>
-                <li>After login, you'll return with an API key</li>
-            </ol>
-            <button id="startAuth" class="primary-btn"><i class="fas fa-external-link-alt"></i> Start Authentication</button>
-            <button id="closeAuth" class="secondary-btn">Cancel</button>
+            <div class="modal-header">
+                <h3>Image Settings</h3>
+                <button class="close-modal" id="closeImageSettings">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="setting-group">
+                    <label>Width:</label>
+                    <input type="number" id="width" value="1024" min="256" max="2048">
+                </div>
+                <div class="setting-group">
+                    <label>Height:</label>
+                    <input type="number" id="height" value="1024" min="256" max="2048">
+                </div>
+                <div class="setting-group">
+                    <label>Negative Prompt:</label>
+                    <textarea id="negativePrompt" rows="3" placeholder="What to avoid...">worst quality, blurry</textarea>
+                </div>
+                <div class="setting-group" id="videoSettings">
+                    <label>Duration (seconds):</label>
+                    <input type="number" id="duration" min="2" max="10" value="4">
+                    <label>Aspect Ratio:</label>
+                    <select id="aspectRatio">
+                        <option value="">Default</option>
+                        <option value="16:9">16:9</option>
+                        <option value="9:16">9:16</option>
+                    </select>
+                    <label class="toggle-item">
+                        <input type="checkbox" id="audio">
+                        <span class="toggle-label">Generate Audio</span>
+                    </label>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div id="resultModal" class="modal">
-        <div class="modal-content large">
-            <span class="close-modal">&times;</span>
-            <div id="modalContent"></div>
+    <!-- Text Presets Modal -->
+    <div class="modal" id="textPresetsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>System Prompts</h3>
+                <button class="close-modal" id="closeTextPresets">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <textarea id="systemPrompt" rows="6" placeholder="You are a helpful AI assistant..."></textarea>
+                <div class="preset-buttons">
+                    <button class="btn-outline" data-preset="assistant">Helpful Assistant</button>
+                    <button class="btn-outline" data-preset="creative">Creative Writer</button>
+                    <button class="btn-outline" data-preset="coder">Expert Programmer</button>
+                    <button class="btn-outline" data-preset="analyst">Data Analyst</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div class="modal" id="authModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-lock"></i> BYOP Authentication</h3>
+                <button class="close-modal" id="closeAuth">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="auth-steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Connect Account</h4>
+                            <p>You'll be redirected to Pollinations to sign in</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Authorize Access</h4>
+                            <p>Grant permission to use your Pollen</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Start Creating</h4>
+                            <p>Return to app with your API key</p>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn-primary" id="startAuth">
+                    <i class="fas fa-external-link-alt"></i> Start Authentication
+                </button>
+                <p class="auth-note">
+                    <i class="fas fa-info-circle"></i>
+                    Your API key will be securely stored on this device
+                </p>
+            </div>
         </div>
     </div>
 
     <!-- Loading Overlay -->
-    <div id="loadingOverlay" class="loading-overlay">
-        <div class="loading-spinner">
-            <i class="fas fa-spinner fa-spin fa-3x"></i>
-            <p id="loadingMessage">Processing...</p>
-            <div class="progress-bar">
-                <div class="progress"></div>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="spinner">
+                <i class="fas fa-spinner fa-spin"></i>
             </div>
+            <p id="loadingMessage">Processing...</p>
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <button class="btn-secondary" id="cancelLoading">Cancel</button>
         </div>
     </div>
 
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toastContainer"></div>
+
     <script src="script.js"></script>
 </body>
-                                  </html>
+                        </html>
