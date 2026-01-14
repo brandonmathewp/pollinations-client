@@ -48,26 +48,20 @@ To enable users to use their own Pollen:
 ## Usage Examples
 
 ### Image Generation
-```javascript
 1. Navigate to Image Generation tab
 2. Enter a detailed prompt
 3. Adjust settings (size, model, etc.)
 4. Click Generate
-```
 
 ### Text Generation
-```javascript
 1. Go to Text Generation tab
 2. Enter your prompt
 3. Select a model
 4. Choose preset or custom settings
 5. Generate
-```
 
 ### AI Chat
-```javascript
 1. Go to Chat tab
 2. Type your message
 3. Upload images (optional)
 4. Send and receive AI responses
-```
